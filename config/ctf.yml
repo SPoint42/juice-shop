@@ -6,3 +6,5 @@ application:
   gitHubRibbon: false
 ctf:
   showFlagsInNotifications: true
+  
+export NODE_ENV=ctf  # on Linux
