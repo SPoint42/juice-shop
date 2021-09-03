@@ -103,7 +103,8 @@
     "sqlite3": "~4.0.4",
     "swagger-ui-express": "~4.0.1",
     "unzipper": "0.8.12",
-    "z85": "~0.0"
+    "z85": "~0.0",
+    "@snyk/protect": "latest"
   },
   "devDependencies": {
     "chai": "~4.2",
@@ -148,7 +149,9 @@
     "pree2e": "npm install",
     "e2e": "node test/e2eTests.js",
     "vagrant": "cd vagrant && vagrant up",
-    "package": "grunt package"
+    "package": "grunt package",
+    "prepublish": "npm run snyk-protect",
+    "snyk-protect": "snyk-protect"
   },
   "engines": {
     "node": "8 - 11"
@@ -200,5 +203,6 @@
       "sanitize-html",
       "express-jwt"
     ]
-  }
+  },
+  "snyk": true
 }
