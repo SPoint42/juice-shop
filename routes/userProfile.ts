@@ -25,7 +25,8 @@ module.exports = function getUserProfile () {
       if (loggedInUser) {
         UserModel.findByPk(loggedInUser.data.id).then((user: UserModel | null) => {
           let template = buf.toString()
-          let username = user?.username
+          let username = user?.username // <-- Renforcer la validation du username
+
           if (username?.match(/#{(.*)}/) !== null && !utils.disableOnContainerEnv()) {
             req.app.locals.abused_ssti_bug = true
             const code = username?.substring(2, username.length - 1)
