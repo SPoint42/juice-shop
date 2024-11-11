@@ -15,10 +15,10 @@ const security = require('../lib/insecurity')
 module.exports = function retrieveBasket () {
   return (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id
-      // Verifier que le user est authentifié
-      // Verifier que l'id est bien un nombre
-      // Verifier que l'id est un entier
-      // Verifier que l'id est bien lié au user authentifié
+    // Verifier que le user est authentifié
+    // Verifier que l'id est bien un nombre
+    // Verifier que l'id est un entier
+    // Verifier que l'id est bien lié au user authentifié
 
     BasketModel.findOne({ where: { id }, include: [{ model: ProductModel, paranoid: false, as: 'Products' }] })
       .then((basket: BasketModel | null) => {
