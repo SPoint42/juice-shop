@@ -23,6 +23,8 @@ module.exports.addBasketItem = function addBasketItem () {
     const basketIds = []
     const quantities = []
 
+    // S'assurer que le produit est encore en vente
+
     for (let i = 0; i < result.length; i++) {
       if (result[i].key === 'ProductId') {
         productIds.push(result[i].value)
