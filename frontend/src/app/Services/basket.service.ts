@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Bjoern Kimminich & the OWASP Juice Shop contributors.
+ * Copyright (c) 2014-2025 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
 
@@ -54,10 +54,13 @@ export class BasketService {
   }
 
   updateNumberOfCartItems () {
-    this.find(parseInt(sessionStorage.getItem('bid'), 10)).subscribe((basket) => {
+    this.find(parseInt(sessionStorage.getItem('bid'), 10)).subscribe({
+      next: (basket) => {
       // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-      this.itemTotal.next(basket.Products.reduce((itemTotal, product) => itemTotal + product.BasketItem.quantity, 0))
-    }, (err) => { console.log(err) })
+        this.itemTotal.next(basket.Products.reduce((itemTotal, product) => itemTotal + product.BasketItem.quantity, 0))
+      },
+      error: (err) => { console.log(err) }
+    })
   }
 
   getItemTotal (): Observable<any> {

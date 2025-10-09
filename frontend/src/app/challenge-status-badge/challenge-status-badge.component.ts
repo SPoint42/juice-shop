@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Bjoern Kimminich & the OWASP Juice Shop contributors.
+ * Copyright (c) 2014-2025 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
 
@@ -10,13 +10,19 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faWindows } from '@fortawesome/free-brands-svg-icons'
 
 import { Challenge } from '../Models/challenge.model'
+import { TranslateModule } from '@ngx-translate/core'
+
+import { MatIconModule } from '@angular/material/icon'
+import { MatTooltip } from '@angular/material/tooltip'
+import { MatButtonModule } from '@angular/material/button'
 
 library.add(faWindows)
 
 @Component({
   selector: 'app-challenge-status-badge',
   templateUrl: './challenge-status-badge.component.html',
-  styleUrls: ['./challenge-status-badge.component.scss']
+  styleUrls: ['./challenge-status-badge.component.scss'],
+  imports: [MatButtonModule, MatTooltip, MatIconModule, TranslateModule]
 })
 export class ChallengeStatusBadgeComponent {
   @Input() public challenge: Challenge = { } as Challenge
@@ -27,15 +33,12 @@ export class ChallengeStatusBadgeComponent {
 
   repeatNotification () {
     if (this.allowRepeatNotifications) {
-      this.challengeService.repeatNotification(encodeURIComponent(this.challenge.name)).subscribe(() => {
-        this.windowRefService.nativeWindow.scrollTo(0, 0)
-      }, (err) => { console.log(err) })
-    }
-  }
-
-  openHint () {
-    if (this.showChallengeHints && this.challenge.hintUrl) {
-      this.windowRefService.nativeWindow.open(this.challenge.hintUrl, '_blank')
+      this.challengeService.repeatNotification(encodeURIComponent(this.challenge.name)).subscribe({
+        next: () => {
+          this.windowRefService.nativeWindow.scrollTo(0, 0)
+        },
+        error: (err) => { console.log(err) }
+      })
     }
   }
 }

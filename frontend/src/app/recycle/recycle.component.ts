@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Bjoern Kimminich & the OWASP Juice Shop contributors.
+ * Copyright (c) 2014-2025 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
 
@@ -7,20 +7,29 @@ import { ConfigurationService } from '../Services/configuration.service'
 import { UserService } from '../Services/user.service'
 import { RecycleService } from '../Services/recycle.service'
 import { Component, type OnInit, ViewChild } from '@angular/core'
-import { UntypedFormControl, Validators } from '@angular/forms'
+import { UntypedFormControl, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons'
 import { FormSubmitService } from '../Services/form-submit.service'
 import { AddressComponent } from '../address/address.component'
-import { TranslateService } from '@ngx-translate/core'
+import { TranslateService, TranslateModule } from '@ngx-translate/core'
 import { SnackBarHelperService } from '../Services/snack-bar-helper.service'
+import { MatButtonModule } from '@angular/material/button'
+import { MatCheckbox } from '@angular/material/checkbox'
+import { MatDatepickerInput, MatDatepickerToggle, MatDatepicker } from '@angular/material/datepicker'
+
+import { MatInputModule } from '@angular/material/input'
+import { MatFormFieldModule, MatLabel, MatError, MatSuffix } from '@angular/material/form-field'
+
+import { MatCardModule, MatCardImage, MatCardContent } from '@angular/material/card'
 
 library.add(faPaperPlane)
 
 @Component({
   selector: 'app-recycle',
   templateUrl: './recycle.component.html',
-  styleUrls: ['./recycle.component.scss']
+  styleUrls: ['./recycle.component.scss'],
+  imports: [MatCardModule, TranslateModule, MatFormFieldModule, MatLabel, MatInputModule, FormsModule, ReactiveFormsModule, MatError, AddressComponent, MatDatepickerInput, MatDatepickerToggle, MatSuffix, MatDatepicker, MatCheckbox, MatButtonModule, MatCardImage, MatCardContent]
 })
 export class RecycleComponent implements OnInit {
   @ViewChild('addressComp', { static: true }) public addressComponent: AddressComponent
@@ -39,15 +48,18 @@ export class RecycleComponent implements OnInit {
     private readonly configurationService: ConfigurationService, private readonly formSubmitService: FormSubmitService,
     private readonly translate: TranslateService, private readonly snackBarHelperService: SnackBarHelperService) { }
 
-  ngOnInit () {
-    this.configurationService.getApplicationConfiguration().subscribe((config: any) => {
-      if (config?.application?.recyclePage) {
+  ngOnInit (): void {
+    this.configurationService.getApplicationConfiguration().subscribe({
+      next: (config: any) => {
+        if (config?.application?.recyclePage) {
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        this.topImage = `assets/public/images/products/${config.application.recyclePage.topProductImage}`
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        this.bottomImage = `assets/public/images/products/${config.application.recyclePage.bottomProductImage}`
-      }
-    }, (err) => { console.log(err) })
+          this.topImage = `assets/public/images/products/${config.application.recyclePage.topProductImage}`
+          // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+          this.bottomImage = `assets/public/images/products/${config.application.recyclePage.bottomProductImage}`
+        }
+      },
+      error: (err) => { console.log(err) }
+    })
 
     this.initRecycle()
     this.findAll()
@@ -56,12 +68,15 @@ export class RecycleComponent implements OnInit {
   }
 
   initRecycle () {
-    this.userService.whoAmI().subscribe((data) => {
-      this.recycle = {}
-      this.recycle.UserId = data.id
-      this.userEmail = data.email
-      this.requestorControl.setValue(this.userEmail)
-    }, (err) => { console.log(err) })
+    this.userService.whoAmI().subscribe({
+      next: (data) => {
+        this.recycle = {}
+        this.recycle.UserId = data.id
+        this.userEmail = data.email
+        this.requestorControl.setValue(this.userEmail)
+      },
+      error: (err) => { console.log(err) }
+    })
   }
 
   save () {
@@ -72,34 +87,46 @@ export class RecycleComponent implements OnInit {
       this.recycle.date = this.pickUpDateControl.value
     }
 
-    this.recycleService.save(this.recycle).subscribe((savedRecycle: any) => {
-      if (savedRecycle.isPickup) {
-        this.translate.get('CONFIRM_RECYCLING_PICKUP', { pickupdate: savedRecycle.pickupDate }).subscribe((confirmRecyclingPickup) => {
-          this.snackBarHelperService.open(confirmRecyclingPickup, 'confirmBar')
-        }, (translationId) => {
-          this.snackBarHelperService.open(translationId, 'confirmBar')
-        })
-      } else {
-        this.translate.get('CONFIRM_RECYCLING_BOX').subscribe((confirmRecyclingBox) => {
-          this.snackBarHelperService.open(confirmRecyclingBox, 'confirmBar')
-        }, (translationId) => {
-          this.snackBarHelperService.open(translationId, 'confirmBar')
-        })
+    this.recycleService.save(this.recycle).subscribe({
+      next: (savedRecycle: any) => {
+        if (savedRecycle.isPickup) {
+          this.translate.get('CONFIRM_RECYCLING_PICKUP', { pickupdate: savedRecycle.pickupDate }).subscribe({
+            next: (confirmRecyclingPickup) => {
+              this.snackBarHelperService.open(confirmRecyclingPickup, 'confirmBar')
+            },
+            error: (translationId) => {
+              this.snackBarHelperService.open(translationId, 'confirmBar')
+            }
+          })
+        } else {
+          this.translate.get('CONFIRM_RECYCLING_BOX').subscribe({
+            next: (confirmRecyclingBox) => {
+              this.snackBarHelperService.open(confirmRecyclingBox, 'confirmBar')
+            },
+            error: (translationId) => {
+              this.snackBarHelperService.open(translationId, 'confirmBar')
+            }
+          })
+        }
+        this.addressComponent.load()
+        this.initRecycle()
+        this.resetForm()
+      },
+      error: (err) => {
+        this.snackBarHelperService.open(err.error?.error, 'errorBar')
+        console.log(err)
       }
-      this.addressComponent.load()
-      this.initRecycle()
-      this.resetForm()
-    }, (err) => {
-      this.snackBarHelperService.open(err.error?.error, 'errorBar')
-      console.log(err)
     })
   }
 
   findAll () {
-    this.recycleService.find().subscribe((recycles) => {
-      this.recycles = recycles
-    }, (error) => {
-      console.log(error)
+    this.recycleService.find().subscribe({
+      next: (recycles) => {
+        this.recycles = recycles
+      },
+      error: (error) => {
+        console.log(error)
+      }
     })
   }
 
