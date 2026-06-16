@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2025 Bjoern Kimminich & the OWASP Juice Shop contributors.
+ * Copyright (c) 2014-2026 Bjoern Kimminich & the OWASP Juice Shop contributors.
  * SPDX-License-Identifier: MIT
  */
 
@@ -116,14 +116,16 @@ const CHALLENGE_KEYS = [
   'resetPasswordUvoginChallenge',
   'geoStalkingMetaChallenge',
   'geoStalkingVisualChallenge',
-  'killChatbotChallenge',
   'nullByteChallenge',
-  'bullyChatbotChallenge',
   'lfrChallenge',
   'closeNotificationsChallenge',
   'csafChallenge',
   'exposedCredentialsChallenge',
-  'leakedApiKeyChallenge'
+  'leakedApiKeyChallenge',
+  'passwordHashLeakChallenge',
+  'chatbotPromptInjectionChallenge',
+  'chatbotGreedyInjectionChallenge',
+  'aiDebuggingChallenge'
 ] as const
 
 export type ChallengeKey = typeof CHALLENGE_KEYS[number]
